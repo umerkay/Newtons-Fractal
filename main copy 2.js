@@ -127,7 +127,7 @@ const Presets = [
 let roots;
 let polynomialDegree;
 
-window.addEventListener("load", () => {
+document.addEventListener("DOMContentLoaded", () => {
     new SelectInput("Preset", "preset", Presets.map(p => p.title), null, { parent: "#Variables" }).setOnInput((i) => {
 
         document.getElementById("funcoutput").innerHTML = null;
@@ -164,7 +164,22 @@ window.addEventListener("load", () => {
     new NumberInput("Scale", "zoom", 100, { min: 1, max: 1000, step: 10, parent: "#Variables", range: true });
     new CheckBox("Show shading", "doFade", false, { parent: "#Variables" });
     new NumberInput("Shading", "fadeTolerance", 10, { min: 1, max: 100, step: 1, parent: "#Variables", range: true });
-    dragElement(document.getElementById("DataBox"));
+    // dragElement(document.getElementById("DataBox"));
+    const _position1 = { x: 0, y: 0 }
+    interact('#DataBox').draggable({
+        listeners: {
+            start(event) {
+                console.log(event.type, event.target)
+            },
+            move(event) {
+                _position1.x += event.dx
+                _position1.y += event.dy
+
+                event.target.style.transform =
+                    `translate(${_position1.x}px, ${_position1.y}px)`
+            },
+        }
+    })
     Variables.set("preset", 1);
 
 
@@ -317,21 +332,36 @@ function StartRender() {
     c.setAttribute("id", "dbC" + Sketches.all.length);
     c.classList.add("dragC");
 
-    let header = document.createElement("span");
-    header.innerHTML = "Drag to move";
-    header.setAttribute("id", c.id + "header");
-    header.classList.add("dragH");
+    // let header = document.createElement("span");
+    // header.innerHTML = "Drag to move";
+    // header.setAttribute("id", c.id + "header");
+    // header.classList.add("dragH");
 
     let close = document.createElement("span");
     close.innerHTML = "Close";
     close.classList.add("dragCl");
     let i = Sketches.all.length;
 
-    c.appendChild(header);
+    // c.appendChild(header);
     c.appendChild(close);
     document.getElementById("dbC").appendChild(c);
 
-    dragElement(c);
+    // dragElement(c);
+    const _position2 = { x: 0, y: 0 }
+    interact(c).draggable({
+        listeners: {
+            start(event) {
+                console.log(event.type, event.target)
+            },
+            move(event) {
+                _position2.x += event.dx
+                _position2.y += event.dy
+
+                event.target.style.transform =
+                    `translate(${_position2.x}px, ${_position2.y}px)`
+            },
+        }
+    })
 
     c.style.left = (openSketches.length) + "rem";
     c.style.top = (openSketches.length) + "rem";
