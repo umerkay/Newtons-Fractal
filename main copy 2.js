@@ -283,6 +283,7 @@ function step(point, polynomial, derivative) {
 }
 
 function closeSketch(index) {
+    openSketches = openSketches.filter(s => s != index);
     if (index === main) toggleRenderBtn(true);
     index.stopLoop();
     index.container.remove();
@@ -293,6 +294,8 @@ function toggleRenderBtn(enabled) {
     document.getElementById("render").disabled = !enabled;
     document.getElementById("render").innerHTML = enabled ? "Render" : "Rendering...";
 }
+
+let openSketches = [];
 
 function StartRender() {
     if (!Variables.preset) return window.alert("Select a preset");
@@ -329,7 +332,11 @@ function StartRender() {
 
     dragElement(c);
 
+    c.style.left = (openSketches.length) + "rem";
+    c.style.top = (openSketches.length) + "rem";
+
     main = new Sketch({ width: Variables.width, height: Variables.height, frameRate: 60, container: c });
+    openSketches.push(main);
 
     let m = main;
     close.addEventListener("click", () => closeSketch(m));
