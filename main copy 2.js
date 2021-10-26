@@ -146,16 +146,17 @@ window.addEventListener("load", () => {
         Variables.set("fadeTolerance", Presets[i].fadeTolerance || 10);
         if (i > 0) {
             Variables.disable("roots");
-            Variables.disable("derivative");
+            // Variables.disable("derivative");
         } else {
             Variables.enable("roots");
-            Variables.enable("derivative");
+            // Variables.enable("derivative");
         }
 
     });
     new SelectInput("Color Scheme", "colors", ColorSchemes.map(p => p.title), 0, { parent: "#Variables" });
     new TextInput("Roots", "roots", "[]", { parent: "#Variables" });
     new TextInput("f'(z) =", "derivative", "", { parent: "#Variables", placeholder: "Derivative function" });
+    Variables.disable("derivative");
     new TextInput("Steps", "steps", 12, { parent: "#Variables" });
     new CheckBox("Render steps", "showAnim", true, { parent: "#Variables" });
     new NumberInput("Width", "width", 400, { min: 100, max: width, step: 1, parent: "#Variables", range: true });
@@ -299,11 +300,11 @@ let openSketches = [];
 
 function StartRender() {
     if (!Variables.preset) return window.alert("Select a preset");
-    if (!Variables.derivative || !Variables.roots) return window.alert("The roots of the function and the derivative is required");
+    if (!Variables.roots) return window.alert("The roots of the function and the derivative is required");
     if (Variables.preset == 0) {
         try {
             _roots = JSON.parse(Variables.roots);
-            _derivative = math.parse(Variables.derivative);
+            _derivative = Variables.derivative ? math.parse(Variables.derivative) : math.derivative(math.parse(_roots.map(root => "(z - (" + root + "))").join("")), "z");
         } catch (err) {
             document.log("Error: " + err);
             return;
@@ -343,7 +344,7 @@ function StartRender() {
 
     // main = new Sketch({ width, height: height - 4, frameRate: 60 });
     // roots = Presets[Variables.preset].roots;
-    roots = (Presets[Variables.preset].roots || _roots).map((r, i) => new Point(new Complex(r), ColorSchemes[Variables.colors].colors[i % ColorSchemes[Variables.colors].colors.length]));
+    roots = (Variables.preset > 0 ? Presets[Variables.preset].roots : _roots).map((r, i) => new Point(new Complex(r), ColorSchemes[Variables.colors].colors[i % ColorSchemes[Variables.colors].colors.length]));
     polynomialDegree = roots.length;
     dP = Presets[Variables.preset].dP || ((z) => _derivative.evaluate({ z: math.complex(z) }));
     P = Presets[Variables.preset].P;
