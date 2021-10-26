@@ -1,0 +1,221 @@
+* {
+  padding: 0px;
+  margin: 0px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+canvas {
+  border-radius: 0.5rem;
+  -webkit-box-shadow: 0px 0px 15px #777777;
+          box-shadow: 0px 0px 15px #777777;
+}
+
+body {
+  background-color: black;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#title {
+  font-size: 5rem;
+  position: absolute;
+  color: white;
+  top: 1rem;
+}
+
+#subtitle {
+  font-size: 3rem;
+  position: absolute;
+  color: white;
+  bottom: 1rem;
+}
+
+#dbC, .dragC {
+  position: absolute;
+  color: white;
+  gap: 0.5rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+#dbC .dragH, .dragC .dragH {
+  cursor: move;
+  z-index: 10;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 1.5rem;
+  border-radius: 1rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 0.25rem;
+  font-size: 0.5rem;
+  margin-left: 0.25rem;
+}
+
+#dbC .dragCl, .dragC .dragCl {
+  cursor: pointer;
+  z-index: 10;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 1.5rem;
+  border-radius: 1rem;
+  font-size: 0.5rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 0.25rem;
+}
+
+#dbC .dragCl:hover, .dragC .dragCl:hover {
+  text-decoration: underline;
+}
+
+#log {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 300px;
+  overflow-y: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  color: white;
+  padding: 0.25rem;
+  width: 200px;
+}
+
+#funcoutput {
+  margin-top: 0.5rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+#DataBox {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  z-index: 9;
+  -webkit-box-shadow: 0px 0px 15px #777777;
+          box-shadow: 0px 0px 15px #777777;
+  border-radius: 1rem;
+  background-color: #131313;
+  color: white;
+}
+
+#DataBox #DataBoxheader {
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  color: #black;
+  text-align: center;
+}
+
+#DataBox button {
+  padding: 1rem;
+  width: 100%;
+  background-color: #2958b1;
+  border-radius: 100rem;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  -webkit-transition-duration: 300ms;
+          transition-duration: 300ms;
+  cursor: pointer;
+}
+
+#DataBox button:hover {
+  opacity: 0.9;
+  -webkit-transition-duration: 300ms;
+          transition-duration: 300ms;
+}
+
+#DataBox button:disabled {
+  -webkit-transition-duration: 0ms;
+          transition-duration: 0ms;
+  background-color: grey;
+  cursor: auto;
+}
+
+#DataBox button:disabled:hover {
+  opacity: 1;
+}
+
+#DataBox #Variables {
+  width: 400px;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  padding-top: 0rem;
+}
+
+#DataBox #Variables .VariableContainer {
+  padding: 0.5rem;
+  display: -ms-grid;
+  display: grid;
+  gap: 1rem;
+  -ms-grid-columns: 2fr 3fr;
+      grid-template-columns: 2fr 3fr;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 2.5rem;
+}
+
+#DataBox #Variables .VariableContainer > * {
+  display: block;
+}
+
+#DataBox #Variables .VariableContainer .VariableInput {
+  border-radius: 100rem;
+  border: none;
+  width: 100%;
+  background-color: #f3f3f3;
+  padding: 0.25rem;
+  font-size: 1.2rem;
+}
+
+#DataBox #Variables .VariableContainer .VariableInput:disabled {
+  color: grey;
+  background-color: #f8f8f8;
+}
+/*# sourceMappingURL=index.css.map */
