@@ -120,6 +120,15 @@ body {
   width: 200px;
 }
 
+#desc {
+  color: white;
+  width: 350px;
+}
+
+a {
+  color: #d1d1d1;
+}
+
 #funcoutput {
   margin-top: 0.5rem;
   display: -webkit-box;
