@@ -37,6 +37,26 @@ let ColorSchemes = [
             new Color(229, 25, 251),
             new Color(0, 85, 195),
         ]
+    },
+    {
+        title: "Henna", colors: [
+            new Color(237, 201, 183),
+
+            new Color(97, 48, 0),
+
+            new Color(97, 48, 0),
+            new Color(97, 48, 0),
+
+
+            new Color(237, 201, 183),
+            new Color(237, 201, 183),
+
+            new Color(237, 201, 183),
+            new Color(237, 201, 183),
+            new Color(237, 201, 183),
+            new Color(237, 201, 183),
+            new Color(237, 201, 183),
+        ]
     }
 ]
 
@@ -48,8 +68,6 @@ const Presets = [
         zoom: 150,
         steps: "Infinity",
         showAnim: true,
-        derivative: "",
-        P: F,
         render: {
             func: "Custom-func.svg"
         }
@@ -61,11 +79,6 @@ const Presets = [
         zoom: 150,
         steps: "Infinity",
         showAnim: true,
-        dP: function (z) {
-            return z.pow(4).mul(5).add(z.mul(2)).add(-1);
-        },
-        derivative: "5*z^4 + 2z - 1",
-        P: F,
         render: {
             func: "3b1b-func.svg"
         }
@@ -79,11 +92,6 @@ const Presets = [
         colorScheme: 1,
         fadeTolerance: 32,
         showAnim: true,
-        derivative: "3*z^2",
-        dP: function (z) {
-            return z.pow(2).mul(3);
-        },
-        P: F,
         render: {
             func: "Cubic-func.svg"
         }
@@ -95,11 +103,6 @@ const Presets = [
         steps: "Infinity",
         colorScheme: 0,
         showAnim: true,
-        derivative: "6z^5 + 3x^2",
-        dP: function (z) {
-            return z.pow(5).mul(6).add(z.pow(2).mul(3));
-        },
-        P: F,
         render: {
             func: "Hexa-func.svg"
         }
@@ -113,11 +116,6 @@ const Presets = [
         colorScheme: 2,
         fadeTolerance: 32,
         showAnim: true,
-        dP: function (z) {
-            return z.pow(7).mul(8).add(z.pow(3).mul(60));
-        },
-        derivative: "8*z^7 + 60*z^3",
-        P: F,
         render: {
             func: "Chaos-func.svg"
         }
@@ -138,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         Variables.set("zoom", Presets[i].zoom);
         Variables.set("roots", JSON.stringify(Presets[i].roots));
-        Variables.set("derivative", Presets[i].derivative);
         Variables.set("colors", Presets[i].colorScheme);
         Variables.set("steps", parseFloat(Presets[i].steps));
         Variables.set("showAnim", Presets[i].showAnim);
@@ -146,17 +143,13 @@ document.addEventListener("DOMContentLoaded", () => {
         Variables.set("fadeTolerance", Presets[i].fadeTolerance || 10);
         if (i > 0) {
             Variables.disable("roots");
-            // Variables.disable("derivative");
         } else {
             Variables.enable("roots");
-            // Variables.enable("derivative");
         }
 
     });
     new SelectInput("Color Scheme", "colors", ColorSchemes.map(p => p.title), 0, { parent: "#Variables" });
     new TextInput("Roots", "roots", "[]", { parent: "#Variables" });
-    new TextInput("f'(z) =", "derivative", "", { parent: "#Variables", placeholder: "Derivative function" });
-    Variables.disable("derivative");
     new TextInput("Steps", "steps", 12, { parent: "#Variables" });
     new CheckBox("Render steps", "showAnim", true, { parent: "#Variables" });
     new NumberInput("Width", "width", 400, { min: 100, max: width, step: 1, parent: "#Variables", range: true });
@@ -195,14 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
 });
 
-function F(z) {
-    let value = z.sub(roots[0].pos);
-    for (let i = 1; i < polynomialDegree; i++) {
-        value = value.mul(z.sub(roots[i].pos));
-    }
-    return value;
-}
-
 let buffer, idata;
 let start;
 
@@ -214,31 +199,26 @@ function init() {
 
     for (let y = 0; y < height; y += 1) {
         for (let x = 0; x < width; x += 1) {
-            pointsArray.push(new Complex((x - width / 2) / Variables.zoom, (y - height / 2) / Variables.zoom));
-            pointsArray[pointsArray.length - 1].index = (y * width + x) * 4;
+            pointsArray.push({ re: (x - width / 2) / Variables.zoom, im: (y - height / 2) / Variables.zoom, index: (y * width + x) * 4 });
             detPixelColor(pointsArray[pointsArray.length - 1]);
         }
     }
 
     idata.data.set(buffer);
-    save();
-    scale(0.5);
     main.currentCtx.putImageData(idata, 0, 0);
-    restore();
 
     toggleRenderBtn(false);
 }
 
 function loop() {
+    if (this._frames === 0) console.log(this._frames_last)
     let now = performance.now();
 
     if (main._frameCount <= Variables.steps && pointsArray.length > 0) {
-        console.log(main._frameCount + " started rendering");
+        console.log(main._frameCount + " started rendering", pointsArray.length);
 
         pointsArray = pointsArray.filter((point, i) => {
-            let c = step(point, P, dP);
-            point.im = c.im; point.re = c.re;
-            detPixelColor(point);
+            step(point);
             return !point.reached;
         });
     } else {
@@ -259,12 +239,6 @@ function loop() {
     }
 }
 
-// function P(z) {
-//     return z.pow(5).add(z.pow(2)).add(z.mul(-1)).add(1);
-// }
-
-// let fText = roots.map(root => "(x - (" + root.pos.toString() + "))").join("");
-
 function detPixelColor(point) {
     let closest = null;
     let closestDist = Infinity;
@@ -279,11 +253,11 @@ function detPixelColor(point) {
             }
         }
     }
-    if (!closest) point.reached = true;
+    // if (!closest) point.reached = true;
     setPixelColor(point.index, closest?.color || new Color(255), point.reached);
 }
 
-function setPixelColor(index, color, reached) {
+function setPixelColor(index, color) {
     if (Variables.doFade) {
         buffer[index] = color.r * ((main._frameCount) / Variables.fadeTolerance);
         buffer[index + 1] = color.g * (main._frameCount / Variables.fadeTolerance);
@@ -297,8 +271,31 @@ function setPixelColor(index, color, reached) {
     }
 }
 // let a = new Complex(2, 0);
-function step(point, polynomial, derivative) {
-    return point.sub(polynomial(point).div(derivative(point)));//.mul(a));
+function complexReciprocal(re, im, canReach) {
+    let div = (re * re + im * im);
+    if (div < (1 / Variables.zoom) && canReach !== false) {
+        return { im: 0, re: 0 }
+    }
+    let div_r = 1 / div;
+    return { re: re * div_r, im: -im * div_r };
+}
+
+function step(point) {
+    let sum = { im: 0, re: 0 };
+    for (let root of roots) {
+        let rec = complexReciprocal(point.re - root.pos.re, point.im - root.pos.im);
+        if (rec.im === 0 && rec.re === 0) {
+            point.reached = true;
+            setPixelColor(point.index, root.color)
+            return;
+        } else {
+            sum.im += rec.im;
+            sum.re += rec.re;
+        }
+    }
+    let rec = complexReciprocal(sum.re, sum.im, false);
+    point.re -= rec.re;
+    point.im -= rec.im;
 }
 
 function closeSketch(index) {
@@ -318,11 +315,10 @@ let openSketches = [];
 
 function StartRender() {
     if (!Variables.preset) return window.alert("Select a preset");
-    if (!Variables.roots) return window.alert("The roots of the function and the derivative is required");
+    if (!Variables.roots) return window.alert("The roots of the function are required");
     if (Variables.preset == 0) {
         try {
             _roots = JSON.parse(Variables.roots);
-            _derivative = Variables.derivative ? math.parse(Variables.derivative) : math.derivative(math.parse(_roots.map(root => "(z - (" + root + "))").join("")), "z");
         } catch (err) {
             document.log("Error: " + err);
             return;
@@ -379,8 +375,6 @@ function StartRender() {
     // roots = Presets[Variables.preset].roots;
     roots = (Variables.preset > 0 ? Presets[Variables.preset].roots : _roots).map((r, i) => new Point(new Complex(r), ColorSchemes[Variables.colors].colors[i % ColorSchemes[Variables.colors].colors.length]));
     polynomialDegree = roots.length;
-    dP = Presets[Variables.preset].dP || ((z) => _derivative.evaluate({ z: math.complex(z) }));
-    P = Presets[Variables.preset].P;
 
     main.init(init);
     main.loop(loop);
